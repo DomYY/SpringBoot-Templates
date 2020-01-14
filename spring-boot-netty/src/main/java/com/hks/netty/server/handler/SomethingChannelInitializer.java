@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author heks
  */
-@Component
+//@Component
 @Qualifier("somethingChannelInitializer")
 public class SomethingChannelInitializer extends ChannelInitializer<SocketChannel> {
 

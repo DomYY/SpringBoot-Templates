@@ -4,6 +4,8 @@ import com.hks.netty.config.NettyProperties;
 import com.hks.netty.server.ChannelRepository;
 import com.hks.netty.server.TCPServer;
 import com.hks.netty.server.handler.SomethingChannelInitializer;
+import com.hks.netty.server.handler.WebSocketChannelInitializer;
+import com.hks.netty.server.handler.WebSocketHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -52,7 +54,7 @@ public class NettyApplication {
 		b.group(bossGroup(), workerGroup())
 				.channel(NioServerSocketChannel.class)
 				.handler(new LoggingHandler(LogLevel.DEBUG))
-				.childHandler(somethingChannelInitializer);
+				.childHandler(webSocketChannelInitializer);
 		Map<ChannelOption<?>, Object> tcpChannelOptions = tcpChannelOptions();
 		Set<ChannelOption<?>> keySet = tcpChannelOptions.keySet();
 		for (@SuppressWarnings("rawtypes") ChannelOption option : keySet) {
@@ -62,7 +64,7 @@ public class NettyApplication {
 	}
 
 	@Autowired
-	private SomethingChannelInitializer somethingChannelInitializer;
+	private WebSocketChannelInitializer webSocketChannelInitializer;
 
 	@Bean
 	public Map<ChannelOption<?>, Object> tcpChannelOptions() {

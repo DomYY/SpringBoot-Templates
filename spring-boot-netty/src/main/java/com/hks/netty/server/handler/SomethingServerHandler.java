@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  *
  * @author heks
  */
-@Component
+//@Component
 @Slf4j
 @RequiredArgsConstructor
 @ChannelHandler.Sharable
