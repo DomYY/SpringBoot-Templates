@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @ChannelHandler.Sharable
 @Component
-public class WebSocketHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class WebSocketServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private WebSocketServerHandshaker webSocketServerHandshaker;
     private static final String WEB_SOCKET_URL = "ws://localhost:8888/websocket";
@@ -80,14 +80,14 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<FullHttpReques
     /**
      * 服务端处理客户端websocket请求的核心方法
      *
-     * @param context
+     * @param channelHandlerContext
      * @param fullHttpRequest
      * @throws Exception
      */
     @Override
-    protected void messageReceived(ChannelHandlerContext context, FullHttpRequest fullHttpRequest) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         //处理客户端向服务端发起http握手请求的业务
-        handleHttpRequest(context, fullHttpRequest);
+        handleHttpRequest(channelHandlerContext, fullHttpRequest);
     }
 
     /**
@@ -136,7 +136,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<FullHttpReques
             return;
         }
 
-        //log.info("服务端收到客户端的消息====>>>" + stringBuffer.toString());
         TextWebSocketFrame tws = new TextWebSocketFrame(body);
         //服务端向每个连接上来的客户端群发消息
         NettyConfig.group.writeAndFlush(tws);
@@ -162,8 +161,8 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<FullHttpReques
             pipeline.remove(ctx.name());
             pipeline.addLast(new SimpleChannelInboundHandler<WebSocketFrame>() {
                 @Override
-                protected void messageReceived(ChannelHandlerContext context, WebSocketFrame webSocketFrame) throws Exception {
-                    handleWebSocketFrame(context, webSocketFrame);
+                protected void channelRead0(ChannelHandlerContext channelHandlerContext, WebSocketFrame webSocketFrame) throws Exception {
+                    handleWebSocketFrame(channelHandlerContext, webSocketFrame);
                 }
             });
             webSocketServerHandshaker.handshake(ctx.channel(), req);
@@ -178,7 +177,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<FullHttpReques
      * @param res
      */
     private void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, DefaultFullHttpResponse res) {
-        if (res.getStatus().code() != 200) {
+        if (res.status().code() != 200) {
             ByteBuf buf = Unpooled.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();

@@ -5,16 +5,11 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WebSocketChannelInitializer extends ChannelInitializer<NioSocketChannel> {
-
-    private static final StringDecoder DECODER = new StringDecoder();
-    private static final StringEncoder ENCODER = new StringEncoder();
 
     @Override
     protected void initChannel(NioSocketChannel channel) throws Exception {
@@ -30,6 +25,6 @@ public class WebSocketChannelInitializer extends ChannelInitializer<NioSocketCha
         pipeline.addLast("http-chunked", new ChunkedWriteHandler());
 
         // 增加WebSocket 服务端的handler
-        pipeline.addLast(new WebSocketHandler());
+        pipeline.addLast(new WebSocketServerHandler());
     }
 }
